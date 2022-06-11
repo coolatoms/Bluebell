@@ -2,6 +2,7 @@
 package router
 
 import (
+	"net/http"
 	"studyWeb/Bluebell/controller"
 	"studyWeb/Bluebell/logger"
 	"studyWeb/Bluebell/middlewares"
@@ -16,12 +17,25 @@ func SetupRouter(mode string) *gin.Engine {
 	//r := gin.Default()
 	r := gin.New()
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
-	r.POST("/signup", controller.SingUpHandler)
-	r.POST("/login", controller.LoginHandler)
-	r.GET("/ping", middlewares.JWTAuthMiddleware(), func(c *gin.Context) {
-		//	如果是登陆的用户，判断请求头中是否包含，有效的JWT，认证放到中间件中middlewares.JWTAuthMiddleware()
-		c.Request.Header.Get("Authorization")
-	})
+	//注册
+	v1 := r.Group("/api/v1")
 
+	v1.POST("/signup", controller.SingUpHandler)
+	//登录
+	v1.POST("/login", controller.LoginHandler)
+
+	v1.Use(middlewares.JWTAuthMiddleware())
+	{
+		v1.GET("/community", controller.CommunityHandler)
+		v1.GET("/community/:id", controller.CommunityDetailHandler)
+
+		v1.POST("/post", controller.CreatePostHandler)
+		v1.GET("/post/:id", controller.GetPostDetailHandler)
+	}
+	r.NoRoute(func(context *gin.Context) {
+		context.JSON(http.StatusOK, gin.H{
+			"msg": "404",
+		})
+	})
 	return r
 }

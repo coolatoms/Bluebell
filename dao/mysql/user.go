@@ -4,17 +4,10 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
-	"errors"
 	"studyWeb/Bluebell/models"
 )
 
 const secort = "qiuyunhui"
-
-var (
-	ErrorUserExist       = errors.New("用户已存在")
-	ErrorUserNotExist    = errors.New("用户不存在")
-	ErrorInvalidPassword = errors.New("用户密码错误")
-)
 
 // CheckUserExist 检查用户是否存在
 func CheckUserExist(username string) error {
@@ -62,4 +55,11 @@ func Login(login *models.User) (err error) {
 		return ErrorInvalidPassword
 	}
 	return nil
+}
+
+func GetUserByID(id int64) (user *models.User, err error) {
+	user = new(models.User)
+	sqlStr := `select user_id, username from user where user_id = ?`
+	err = db.Get(user, sqlStr, id)
+	return
 }
