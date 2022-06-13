@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,4 +24,19 @@ func GetCurrentUser(ctx *gin.Context) (userID int64, err error) {
 		return
 	}
 	return
+}
+
+// GetPageInfo 获取页面参数
+func GetPageInfo(ctx *gin.Context) (int64, int64) {
+	offsetstr := ctx.Query("page")
+	limitstr := ctx.Query("size")
+	offset, err := strconv.ParseInt(offsetstr, 10, 64)
+	if err != nil {
+		offset = 1
+	}
+	limit, err := strconv.ParseInt(limitstr, 10, 64)
+	if err != nil {
+		limit = 10
+	}
+	return offset, limit
 }

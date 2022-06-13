@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"studyWeb/Bluebell/dao/mysql"
 	"studyWeb/Bluebell/logic"
 	"studyWeb/Bluebell/models"
@@ -60,12 +61,16 @@ func LoginHandler(ctx *gin.Context) {
 	}
 
 	//	2，业务逻辑
-	token, err := logic.Login(p)
+	user, err := logic.Login(p)
 	if err != nil {
 		zap.L().Error("logic.login failed", zap.String("username", p.Username), zap.Error(err))
 		ResponseError(ctx, CodeInvalidPassword)
 		return
 	}
 	//	3，返回相应
-	ResponseSuccess(ctx, token)
+	ResponseSuccess(ctx, gin.H{
+		"user_id":   fmt.Sprintf("%d", user.UserID),
+		"user_name": user.Username,
+		"token":     user.Token,
+	})
 }

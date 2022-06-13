@@ -27,18 +27,23 @@ func SingUp(p *models.ParamSignUp) (err error) {
 }
 
 // Login 登录逻辑
-func Login(login *models.ParamLogin) (token string, err error) {
+func Login(login *models.ParamLogin) (user *models.User, err error) {
 	//
-	user := &models.User{
+	user = &models.User{
 		Username: login.Username,
 		Password: login.Password,
 	}
 	//登录查询 , 传递指针能拿到userID
 	err = mysql.Login(user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	//生成JWTToken
-	return jwt.GenToken(user.UserID, user.Username)
+	token, err := jwt.GenToken(user.UserID, user.Username)
+	if err != nil {
+		return
+	}
+	user.Token = token
+	return
 }

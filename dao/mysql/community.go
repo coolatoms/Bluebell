@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetCommunityList 获取社区的列表
 func GetCommunityList() (communityList []*models.Community, err error) {
 	sqlstr := "select community_id,community_name from community"
 	if err = db.Select(&communityList, sqlstr); err != nil {
